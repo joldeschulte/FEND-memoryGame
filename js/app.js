@@ -1,35 +1,42 @@
-let moveCounter = 0;
-let openCards = [];
+let moveCounter = 0; // keep track of the moves a player makes
+let openCards = []; // cards with class 'open'; max length 2
 let allStars = document.getElementsByClassName("stars"); // [0] modal; [1] score-panel
 let started = false; //for timer
 let timerInterval = 0;
-const modal = document.getElementById('winModal');
+const modal = document.getElementById('winModal'); // the modal to display on win
 
+// start on page load
 start();
 
+// the start function
 function start() {
   started = false;
   let cards = document.getElementsByClassName("deck")[0].getElementsByTagName("li");
+  // set the class of each card to "card"; all start hidden, ready for a game
   for (let i=0; i < cards.length; i++) {
     cards[i].className = "card";
   };
 
+  // pick out the card shapes for shuffling, put in array
   let cardShapes = document.getElementsByClassName("deck")[0].getElementsByTagName("i");
   let cardClassShapeArr = [];
   for (let i=0; i < cardShapes.length; i++) {
     cardClassShapeArr.push(cardShapes[i].className.split(" ")[1]);
   };
 
+  //shuffle the card shapes in the array
   cardClassShapeArr = shuffle(cardClassShapeArr);
 
   for (let i=0; i < cardShapes.length; i++) {
     cardShapes[i].className = "fa " + cardClassShapeArr[i];
   };
 
+  // event listener on each card for click (to flip them and reveal shapes)
   for (let i=0; i < cards.length; i++) {
     cards[i].addEventListener("click", displayCard);
   };
 
+  //event listeners for reset buttons
   document.getElementsByClassName("fa-repeat")[0].addEventListener("click", reset);
   document.getElementsByClassName("fa-repeat")[1].addEventListener("click", reset);
 
@@ -45,19 +52,21 @@ function start() {
 function reset() {
   let cards = document.getElementsByClassName("deck")[0].getElementsByTagName("li")
   for (let i=0; i < cards.length; i++) {
-    cards[i].className = "blank-card";
+    cards[i].className = "blank-card"; // skip the transition; blank the cards
   };
 
+  // reset the move counter and the openCards
   moveCounter = 0;
   openCards = [];
 
   setTimeout(start, 0);
-  keepScore();
+  keepScore(); // reset the score now that moveCounter is zero again
 
-  document.getElementById("plural").innerText = "Moves";
-  modal.style.display = "none";
+  document.getElementById("plural").innerText = "Moves";  // 0 Move -> 0 Moves in the rare case a user resets on 1 Move
+  modal.style.display = "none";  // take the modal away if a user resets from the modal
 };
 
+//The cards match, change class to "card match". If all cards match, printWinner
 function cardsMatch(cardZero, cardOne) {
   cardZero.className = "card match";
   cardOne.className = "card match";
@@ -74,6 +83,7 @@ function cardsMatch(cardZero, cardOne) {
   };
 };
 
+//if cards do not match, both returned face down
 function cardsDoNotMatch(cardZero, cardOne) {
   cardZero.className = "card";
   setTimeout(function() {
@@ -81,7 +91,7 @@ function cardsDoNotMatch(cardZero, cardOne) {
   }, 0);
 };
 
-
+//scorekeeper function, loses stars with more moves
 function keepScore() {
   let moves = document.getElementsByClassName("moves");
   moves[0].innerText = moveCounter.toString();
@@ -119,13 +129,15 @@ function keepScore() {
   }
 }
 
+//show the modal
 function printWinner() {
   modal.style.display = "block"
   window.clearInterval(timerInterval)
 }
 
 
-
+//every time a mouse event happens, we look for a card, look at its class, add it to the OpenCards array,
+//check for a match, update the displayed score
 function displayCard(mouseEvent) {
   let card = document.elementFromPoint(mouseEvent.x, mouseEvent.y);
   let cardClasses = card.className.split(" ");
@@ -154,6 +166,8 @@ function displayCard(mouseEvent) {
   }
 };
 
+//start time from first clickced card
+//in future will use timer.js library
 function timeIt() {
   let seconds = 0
   let minutes = 0
